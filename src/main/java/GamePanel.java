@@ -11,10 +11,11 @@ public class GamePanel extends JPanel implements ActionListener {
     static final int SCREEN_HEIGHT = 600;
     static final int UNIT_SIZE = 25;
     static final int GAME_UNITS = (SCREEN_WIDTH*SCREEN_HEIGHT)/UNIT_SIZE;
-    static final int DELAY = 75;
+    //TODO selectable difficulty setting, 200 = EASY, 100 = MEDIUM, 75 = HARD, 50 = INSANE, +score muliplier
+    static final int DELAY = 100;
     final int x[] = new int[GAME_UNITS];
     final int y[] = new int[GAME_UNITS];
-    int bodyParts = 6;
+    int bodyParts = 5;
     int applesEaten = 0;
     int appleX;
     int appleY;
@@ -187,11 +188,13 @@ public class GamePanel extends JPanel implements ActionListener {
                     break;
                 case KeyEvent.VK_SPACE:
                     if(!running){
-                        bodyParts=6;
+                        bodyParts=5;
                         applesEaten=0;
-                        x[0] = 0;
-                        y[0] = 0;
                         direction = 'D';
+                        for(int i=0; i<bodyParts; i++){
+                            x[i]=0;
+                            y[i]=0;
+                        }
                         startGame();
                     }
             }

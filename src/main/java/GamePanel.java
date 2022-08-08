@@ -1,6 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.Random;
 
 public class GamePanel extends JPanel implements ActionListener {
@@ -44,10 +47,12 @@ public class GamePanel extends JPanel implements ActionListener {
     public void draw(Graphics g){
 
         if(running) {
+            //draw grid lines
             for (int i = 0; i < SCREEN_HEIGHT / UNIT_SIZE; i++) {
                 g.drawLine(i * UNIT_SIZE, 0, i * UNIT_SIZE, SCREEN_HEIGHT);
                 g.drawLine(0, i * UNIT_SIZE, SCREEN_WIDTH, i * UNIT_SIZE);
             }
+            //draw apple
             g.setColor(Color.RED);
             g.fillOval(appleX, appleY, UNIT_SIZE, UNIT_SIZE);
 
@@ -63,7 +68,8 @@ public class GamePanel extends JPanel implements ActionListener {
                     g.fillRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
                 }
             }
-            g.setColor(Color.RED);
+            //Score text
+            g.setColor(Color.BLUE);
             g.setFont(new Font(null,Font.BOLD,40));
             FontMetrics metrics = getFontMetrics(g.getFont());
             g.drawString("Score: "+applesEaten, (SCREEN_WIDTH - metrics.stringWidth("Score: "+applesEaten))/2, g.getFont().getSize());
@@ -103,6 +109,13 @@ public class GamePanel extends JPanel implements ActionListener {
             applesEaten++;
             newApple();
         }
+        //spawn new apple if newly spawned apple occupied the same space as snake's body
+        for(int i=1; i<=bodyParts; i++){
+            if((x[i] == appleX) && (y[i] == appleY)){
+                newApple();
+//                System.out.println("apple collision with snake's body!");
+            }
+        }
     }
     public void checkCollision(){
         //head with body collision check
@@ -112,7 +125,7 @@ public class GamePanel extends JPanel implements ActionListener {
             }
         }
         //head collision with screen border check
-        if(x[0] < 0 || x[0] > SCREEN_WIDTH || y[0] < 0 || y[0] > SCREEN_HEIGHT){
+        if(x[0] < 0 || x[0] >= SCREEN_WIDTH || y[0] < 0 || y[0] >= SCREEN_HEIGHT){
             running = false;
         }
         if(!running){
@@ -126,10 +139,15 @@ public class GamePanel extends JPanel implements ActionListener {
         FontMetrics metrics = getFontMetrics(g.getFont());
         g.drawString("Game Over", (SCREEN_WIDTH - metrics.stringWidth("Game Over"))/2, SCREEN_HEIGHT/2);
         //score display
-        g.setColor(Color.RED);
+        g.setColor(Color.BLUE);
         g.setFont(new Font(null,Font.BOLD,40));
         FontMetrics metrics2 = getFontMetrics(g.getFont());
         g.drawString("Score: "+applesEaten, (SCREEN_WIDTH - metrics2.stringWidth("Score: "+applesEaten))/2, g.getFont().getSize());
+        //continue
+        g.setColor(Color.YELLOW);
+        g.setFont(new Font(null,Font.BOLD,40));
+        FontMetrics metrics3 = getFontMetrics(g.getFont());
+        g.drawString("Press SPACE to restart", (SCREEN_WIDTH - metrics3.stringWidth("Press SPACE to restart"))/2,SCREEN_HEIGHT-g.getFont().getSize());
     }
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -137,7 +155,8 @@ public class GamePanel extends JPanel implements ActionListener {
             move();
             checkApple();
             checkCollision();
-
+//            System.out.print("x: "+x[0]+" y: "+y[0]);
+//            System.out.println();
         }
         repaint();
     }
@@ -166,6 +185,15 @@ public class GamePanel extends JPanel implements ActionListener {
                         direction = 'D';
                     }
                     break;
+                case KeyEvent.VK_SPACE:
+                    if(!running){
+                        bodyParts=6;
+                        applesEaten=0;
+                        x[0] = 0;
+                        y[0] = 0;
+                        direction = 'D';
+                        startGame();
+                    }
             }
         }
     }
